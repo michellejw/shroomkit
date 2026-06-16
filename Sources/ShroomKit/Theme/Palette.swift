@@ -160,6 +160,17 @@ extension Palette {
         case .twilight: return .twilight
         }
     }
+
+    /// Resolve a palette from a SwiftUI `ColorScheme` for apps that auto-follow
+    /// system appearance instead of exposing a manual toggle.
+    public static func palette(for scheme: ColorScheme) -> Palette {
+        scheme == .dark ? .twilight : .forest
+    }
+
+    /// Semantic alias used by puzzles that need an "over-fill" / warning tone.
+    /// Mushroom cap and warn share the same forest-floor terracotta and twilight
+    /// honey, so they read as the same hue across the suite.
+    public var warn: Color { mushroomCap }
 }
 
 extension Color {
