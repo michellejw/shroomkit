@@ -15,10 +15,12 @@ shapes, a welcome/tutorial flow, etc. ShroomKit packages those patterns so:
 
 ## Source of truth (right now)
 
-Patterns are being extracted FROM the live Shroomsweeper codebase at
-`~/dev/games/shroomsweeper/` (the user is moving it there from
-`~/dev/archive/APPS/puzzle-game/shroomsweeper/` — if the new path isn't there
-yet, fall back to the archive path).
+Patterns are being extracted FROM the live Shroomsweeper codebase. Check both
+of these paths — use whichever exists:
+
+- `~/dev/games/shroomsweeper/` (intended long-term home)
+- `~/dev/archive/APPS/puzzle-game/shroomsweeper/` (current home — may stay
+  here for a while; the move isn't urgent)
 
 Files to mine for patterns:
 
