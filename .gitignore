@@ -7,3 +7,4 @@ DerivedData/
 *.xcworkspace/xcuserdata/
 xcuserdata/
 *.xcuserstate
+node_modules/
