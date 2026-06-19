@@ -1,0 +1,46 @@
+/* Hand-authored Tailwind v4 layer for @shroomgames/tokens.
+   Import AFTER `@import "tailwindcss";` and alongside tokens.css.
+   Colors are `@theme inline` so data-theme switching resolves at runtime. */
+
+@theme inline {
+  --color-app:               var(--shroom-app);
+  --color-board:             var(--shroom-board);
+  --color-pill:              var(--shroom-pill);
+  --color-card:              var(--shroom-card);
+  --color-card-sel:          var(--shroom-card-sel);
+  --color-border:            var(--shroom-border);
+  --color-ink:               var(--shroom-text);
+  --color-ink-soft:          var(--shroom-text-soft);
+  --color-accent:            var(--shroom-accent);
+  --color-on-accent:         var(--shroom-on-accent);
+  --color-tile-covered:      var(--tile-covered);
+  --color-tile-covered-hi:   var(--tile-covered-hi);
+  --color-tile-covered-edge: var(--tile-covered-edge);
+  --color-tile-revealed:     var(--tile-revealed);
+  --color-tile-revealed-edge:var(--tile-revealed-edge);
+  --color-tile-explode:      var(--tile-explode);
+  --color-mushroom-cap:      var(--mushroom-cap);
+  --color-mushroom-stem:     var(--mushroom-stem);
+  --color-mushroom-spot:     var(--mushroom-spot);
+  --color-marker-sign:       var(--marker-sign);
+  --color-marker-post:       var(--marker-post);
+  --color-marker-ink:        var(--marker-ink);
+  --color-spore:             var(--spore-mark);
+  --color-num-1: var(--num-1); --color-num-2: var(--num-2);
+  --color-num-3: var(--num-3); --color-num-4: var(--num-4);
+  --color-num-5: var(--num-5); --color-num-6: var(--num-6);
+  --color-num-7: var(--num-7); --color-num-8: var(--num-8);
+}
+
+@theme {
+  --radius-sm: 10px;  --radius-md: 12px; --radius-lg: 14px;
+  --radius-xl: 16px;  --radius-2xl: 18px; --radius-pill: 22px;
+
+  --spacing-2xs: 4px; --spacing-xs: 8px; --spacing-sm: 12px;
+  --spacing-md: 16px; --spacing-lg: 24px; --spacing-xl: 32px;
+
+  --font-weight-regular: 400; --font-weight-medium: 500;
+  --font-weight-semibold: 600; --font-weight-bold: 700;
+
+  --tracking-eyebrow: 1.3px; --tracking-wide: 2px;
+}

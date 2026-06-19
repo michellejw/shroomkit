@@ -1,0 +1,12 @@
+{
+  "name": "@shroomgames/tokens",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    "./tokens.css": "./tokens.css",
+    "./theme.css": "./theme.css"
+  },
+  "files": ["index.js", "index.d.ts", "tokens.css", "theme.css"],
+  "sideEffects": ["*.css"]
+}

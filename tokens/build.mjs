@@ -246,7 +246,7 @@ const sd = new StyleDictionary({
   platforms: {
     css: {
       transforms: [],
-      buildPath: 'tokens/build/',
+      buildPath: 'tokens/dist/',
       files: [{ destination: 'tokens.css', format: 'shroom/css' }],
       options: { outputReferences: false },
     },
