@@ -9,7 +9,6 @@ function cssVar(token) {
   return '--' + token.path.join('-').toLowerCase();
 }
 function isSwiftOnly(t) { return t.$extensions?.shroom?.swiftOnly === true; }
-function isCssOnly(t) { return t.$extensions?.shroom?.cssOnly === true; }
 
 function dimPx(token) {
   // dimension values are unitless numbers-as-strings → append px for CSS
@@ -63,6 +62,11 @@ function swiftHex(token) {
 const SWIFT_SCALE_NAME = { '2xs': 'xxs', '2xl': 'xxl' };
 function swiftLeaf(name) { return SWIFT_SCALE_NAME[name] ?? name; }
 
+// MUST mirror the per-theme color tokens in tokens.json (color.forest.*,
+// color.twilight.*), excluding `warn` (computed alias) and the cssOnly chrome
+// tokens (frame/island/homeBar). This explicit order is what freezes the
+// generated `Palette` init signature — adding a palette color means adding it
+// here AND in tokens.json. A name here with no matching token throws at build.
 const PALETTE_ORDER = [
   'appBg','boardBg','text','sub','pill','accent','accentText',
   'tileCovered','tileCoveredHi','tileCoveredEdge','tileRevealed','tileRevealedEdge',
