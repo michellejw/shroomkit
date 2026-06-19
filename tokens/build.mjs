@@ -156,6 +156,87 @@ StyleDictionary.registerFormat({
   },
 });
 
+function jsTokensObject(dictionary) {
+  const get = (p0, p1, p2, p3) => dictionary.allTokens.find((t) =>
+    t.path[0] === p0 && t.path[1] === p1 && t.path[2] === p2 && (p3 === undefined || t.path[3] === String(p3)));
+  const num = (t) => Number(t.$value);
+  const str = (t) => JSON.stringify(t.$value);
+
+  const colorLeaves = (theme) => dictionary.allTokens
+    .filter((t) => t.$type === 'color' && t.path[1] === theme && t.path[2] !== 'numberColors'
+      && t.$extensions?.shroom?.swiftOnly !== true && t.$extensions?.shroom?.cssOnly !== true)
+    .map((t) => `      ${t.path[2]}: ${str(t)},`).join('\n');
+
+  const numbers = (theme) => {
+    const out = [];
+    for (let i = 1; i <= 8; i++) out.push(str(get('color', theme, 'numberColors', i)));
+    return out.join(', ');
+  };
+
+  const dimGroup = (group) => dictionary.allTokens
+    .filter((t) => t.path[0] === group && t.$type === 'dimension')
+    .map((t) => `    ${JSON.stringify(t.path[1])}: ${num(t)},`).join('\n');
+
+  const fontGroup = (sub, cast) => dictionary.allTokens
+    .filter((t) => t.path[0] === 'font' && t.path[1] === sub)
+    .map((t) => `    ${t.path[2]}: ${cast(t)},`).join('\n');
+
+  return [
+    `// ${GEN_HEADER}`,
+    `export const tokens = {`,
+    `  color: {`,
+    `    forest: {`,
+    colorLeaves('forest'),
+    `      numberColors: [${numbers('forest')}],`,
+    `    },`,
+    `    twilight: {`,
+    colorLeaves('twilight'),
+    `      numberColors: [${numbers('twilight')}],`,
+    `    },`,
+    `  },`,
+    `  radius: {`, dimGroup('radius'), `  },`,
+    `  space: {`, dimGroup('space'), `  },`,
+    `  font: {`,
+    `    weight: {`, fontGroup('weight', num), `    },`,
+    `    tracking: {`, fontGroup('tracking', num), `    },`,
+    `    design: {`, fontGroup('design', str), `    },`,
+    `  },`,
+    `};`,
+    ``,
+  ].join('\n');
+}
+
+StyleDictionary.registerFormat({
+  name: 'shroom/js',
+  format: ({ dictionary }) => jsTokensObject(dictionary),
+});
+
+StyleDictionary.registerFormat({
+  name: 'shroom/dts',
+  format: () => [
+    `// ${GEN_HEADER}`,
+    `type Hex = string;`,
+    `interface ThemeColors {`,
+    `  appBg: Hex; boardBg: Hex; text: Hex; sub: Hex; pill: Hex; accent: Hex; accentText: Hex;`,
+    `  tileCovered: Hex; tileCoveredHi: Hex; tileCoveredEdge: Hex; tileRevealed: Hex; tileRevealedEdge: Hex;`,
+    `  mushroomCap: Hex; mushroomStem: Hex; mushroomSpot: Hex; explodeBg: Hex;`,
+    `  markerPost: Hex; markerSign: Hex; markerInk: Hex; emptyMark: Hex; tierBorder: Hex; tierBg: Hex; tierSelBg: Hex;`,
+    `  numberColors: Hex[];`,
+    `}`,
+    `export declare const tokens: {`,
+    `  color: { forest: ThemeColors; twilight: ThemeColors };`,
+    `  radius: { sm: number; md: number; lg: number; xl: number; "2xl": number; pill: number };`,
+    `  space: { "2xs": number; xs: number; sm: number; md: number; lg: number; xl: number };`,
+    `  font: {`,
+    `    weight: { regular: number; medium: number; semibold: number; bold: number };`,
+    `    tracking: { normal: number; eyebrow: number; wide: number };`,
+    `    design: { rounded: string; mono: string };`,
+    `  };`,
+    `};`,
+    ``,
+  ].join('\n'),
+});
+
 const sd = new StyleDictionary({
   // Two themes share leaf names (appBg, etc.) → SD warns about output-name
   // collisions. This is intentional; our custom format handles both themes
@@ -175,6 +256,14 @@ const sd = new StyleDictionary({
       files: [
         { destination: 'Palette.swift', format: 'shroom/palette-swift' },
         { destination: 'Tokens.generated.swift', format: 'shroom/scales-swift' },
+      ],
+    },
+    js: {
+      transforms: [],
+      buildPath: 'tokens/dist/',
+      files: [
+        { destination: 'index.js', format: 'shroom/js' },
+        { destination: 'index.d.ts', format: 'shroom/dts' },
       ],
     },
   },
