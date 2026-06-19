@@ -9,6 +9,7 @@ function cssVar(token) {
   return '--' + token.path.join('-').toLowerCase();
 }
 function isSwiftOnly(t) { return t.$extensions?.shroom?.swiftOnly === true; }
+function isCssOnly(t) { return t.$extensions?.shroom?.cssOnly === true; }
 
 function dimPx(token) {
   // dimension values are unitless numbers-as-strings → append px for CSS
@@ -53,6 +54,104 @@ StyleDictionary.registerFormat({
   },
 });
 
+function swiftHex(token) {
+  // resolved color value "#RRGGBB" → 0xRRGGBB
+  return '0x' + String(token.$value).replace('#', '').toUpperCase();
+}
+
+// Swift-legal leaf names (no leading digit).
+const SWIFT_SCALE_NAME = { '2xs': 'xxs', '2xl': 'xxl' };
+function swiftLeaf(name) { return SWIFT_SCALE_NAME[name] ?? name; }
+
+const PALETTE_ORDER = [
+  'appBg','boardBg','text','sub','pill','accent','accentText',
+  'tileCovered','tileCoveredHi','tileCoveredEdge','tileRevealed','tileRevealedEdge',
+  'mushroomCap','mushroomStem','mushroomSpot','explodeBg',
+  'markerPost','markerSign','markerInk','emptyMark','tierBorder','tierBg','tierSelBg',
+];
+
+StyleDictionary.registerFormat({
+  name: 'shroom/palette-swift',
+  format: ({ dictionary }) => {
+    const colorFor = (theme, name) =>
+      dictionary.allTokens.find((t) => t.path[0] === 'color' && t.path[1] === theme && t.path[2] === name);
+    const themeStatic = (theme) => {
+      const lines = PALETTE_ORDER.map((n) => `        ${n}: Color(hex: ${swiftHex(colorFor(theme, n))})`);
+      const nums = ['.clear'];
+      for (let i = 1; i <= 8; i++) {
+        const t = dictionary.allTokens.find((x) => x.path[1] === theme && x.path[2] === 'numberColors' && x.path[3] === String(i));
+        nums.push(`Color(hex: ${swiftHex(t)})`);
+      }
+      lines.push('        numberColors: [\n            ' + nums.join(',\n            ') + '\n        ]');
+      return `    public static let ${theme} = Palette(\n${lines.join(',\n')}\n    )`;
+    };
+    return [
+      `// ${GEN_HEADER}`,
+      `import SwiftUI`,
+      ``,
+      `public struct Palette: Sendable {`,
+      PALETTE_ORDER.map((n) => `    public let ${n}: Color`).join('\n'),
+      `    public let numberColors: [Color]`,
+      ``,
+      `    public init(`,
+      [...PALETTE_ORDER.map((n) => `        ${n}: Color`), `        numberColors: [Color]`].join(',\n'),
+      `    ) {`,
+      [...PALETTE_ORDER.map((n) => `        self.${n} = ${n}`), `        self.numberColors = numberColors`].join('\n'),
+      `    }`,
+      `}`,
+      ``,
+      `extension Palette {`,
+      themeStatic('forest'),
+      ``,
+      themeStatic('twilight'),
+      ``,
+      `    public static func palette(for appearance: Appearance) -> Palette {`,
+      `        switch appearance {`,
+      `        case .forest:   return .forest`,
+      `        case .twilight: return .twilight`,
+      `        }`,
+      `    }`,
+      ``,
+      `    public static func palette(for scheme: ColorScheme) -> Palette {`,
+      `        scheme == .dark ? .twilight : .forest`,
+      `    }`,
+      ``,
+      `    /// Semantic alias: over-fill / warning tone, shared with the mushroom cap.`,
+      `    public var warn: Color { mushroomCap }`,
+      `}`,
+      ``,
+    ].join('\n');
+  },
+});
+
+StyleDictionary.registerFormat({
+  name: 'shroom/scales-swift',
+  format: ({ dictionary }) => {
+    const dims = (group) => dictionary.allTokens
+      .filter((t) => t.path[0] === group && t.$type === 'dimension')
+      .map((t) => `    public static let ${swiftLeaf(t.path[1])}: CGFloat = ${t.$value}`).join('\n');
+    const weights = dictionary.allTokens
+      .filter((t) => t.path[0] === 'font' && t.path[1] === 'weight')
+      .map((t) => `    public static let ${t.path[2]}: Int = ${t.$value}`).join('\n');
+    const tracking = dictionary.allTokens
+      .filter((t) => t.path[0] === 'font' && t.path[1] === 'tracking')
+      .map((t) => `    public static let ${t.path[2]}: CGFloat = ${t.$value}`).join('\n');
+    return [
+      `// ${GEN_HEADER}`,
+      `import CoreGraphics`,
+      ``,
+      `public enum Radius {`, dims('radius'), `}`,
+      ``,
+      `public enum Space {`, dims('space'), `}`,
+      ``,
+      `public enum FontWeightToken {`, weights, `}`,
+      ``,
+      `public enum FontTracking {`, tracking, `}`,
+      ``,
+    ].join('\n');
+  },
+});
+
 const sd = new StyleDictionary({
   // Two themes share leaf names (appBg, etc.) → SD warns about output-name
   // collisions. This is intentional; our custom format handles both themes
@@ -65,6 +164,14 @@ const sd = new StyleDictionary({
       buildPath: 'tokens/build/',
       files: [{ destination: 'tokens.css', format: 'shroom/css' }],
       options: { outputReferences: false },
+    },
+    swift: {
+      transforms: [],
+      buildPath: 'Sources/ShroomKit/Theme/',
+      files: [
+        { destination: 'Palette.swift', format: 'shroom/palette-swift' },
+        { destination: 'Tokens.generated.swift', format: 'shroom/scales-swift' },
+      ],
     },
   },
 });
