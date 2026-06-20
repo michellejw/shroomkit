@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build:tokens": "node tokens/build.mjs",
-    "check:tokens": "node tokens/build.mjs && git diff --exit-code Sources/ShroomKit/Theme/Palette.swift Sources/ShroomKit/Theme/Tokens.generated.swift tokens/build/tokens.css",
+    "check:tokens": "node tokens/build.mjs && git diff --exit-code Sources/ShroomKit/Theme/Palette.swift Sources/ShroomKit/Theme/Tokens.generated.swift tokens/dist/tokens.css tokens/dist/index.js tokens/dist/index.d.ts",
     "test:tokens": "node --test 'tokens/test/*.mjs'"
   },
   "devDependencies": {
