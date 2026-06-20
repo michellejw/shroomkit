@@ -7,11 +7,16 @@ public struct SegmentedToggle<Value: Hashable>: View {
     public struct Segment: Identifiable {
         public let id: Value
         let title: String
-        let icon: AnyView
+        let icon: AnyView?
         public init(_ value: Value, title: String, @ViewBuilder icon: () -> some View) {
             self.id = value
             self.title = title
             self.icon = AnyView(icon())
+        }
+        public init(_ value: Value, title: String) {
+            self.id = value
+            self.title = title
+            self.icon = nil
         }
     }
 
@@ -31,7 +36,7 @@ public struct SegmentedToggle<Value: Hashable>: View {
                 let isActive = segment.id == selection
                 Button { selection = segment.id } label: {
                     HStack(spacing: 7) {
-                        segment.icon
+                        if let icon = segment.icon { icon }
                         Text(segment.title)
                             .font(.system(.subheadline, design: .rounded).weight(.semibold))
                     }
