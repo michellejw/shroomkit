@@ -52,31 +52,11 @@ public struct WelcomeScaffold<Mascot: View>: View {
                     .lineSpacing(2)
             }
             VStack(spacing: 11) {
-                Button(action: onPrimary) {
-                    Text(primaryLabel)
-                        .font(.system(.headline, design: .rounded))
-                        .foregroundStyle(palette.accentText)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 17)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(palette.accent)
-                        )
-                }
-                .buttonStyle(.plain)
+                Button(primaryLabel, action: onPrimary)
+                    .buttonStyle(.shroomPrimary)
 
-                Button(action: onSecondary) {
-                    Text(secondaryLabel)
-                        .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .foregroundStyle(palette.text)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 15)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(palette.pill)
-                        )
-                }
-                .buttonStyle(.plain)
+                Button(secondaryLabel, action: onSecondary)
+                    .buttonStyle(.shroomSecondary)
             }
             Spacer(minLength: 0)
         }
